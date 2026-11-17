@@ -1,0 +1,17 @@
+# Supply a labeled feature table and a JSON schema listing its model inputs.
+# Paths are relative to this file.
+[wdb]
+features = "../data/training_features.parquet"
+schema = "../data/feature_schema.json"
+output = "../runs/random_forest"
+family = "random_forest"
+seed = 20261023
+outer_folds = 5
+inner_folds = 3
+budgets = [0.01, 0.05]
+
+[wdb.parameters]
+n_estimators = 300
+min_samples_leaf = 2
+max_features = "sqrt"
+class_weight = "balanced_subsample"

@@ -1,0 +1,10 @@
+[period]
+algorithms = ["LS", "CE", "AOV"]
+min_period_days = 0.003472222222222222
+max_period_days = 10.0
+samples_per_peak = 10
+top_n_periods = 10
+n_chunks_multiplier = 3
+
+[extraction]
+min_observations = 50

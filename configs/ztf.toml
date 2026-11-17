@@ -1,0 +1,10 @@
+# Explicit host/collection profile; confirm access and release before retrieval.
+[ztf]
+host = "gloria.caltech.edu"
+port = 443
+collection = "ZTF_sources_20240515"
+timeout = 30
+batch_size = 10
+bands = ["g", "r", "i"]
+program_ids = [1, 2, 3]
+min_cadence_days = 0.003472222222222222

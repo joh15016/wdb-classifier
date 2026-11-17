@@ -1,0 +1,4 @@
+# Frozen source of both the Rust CPU extension and the Python dispatch layer.
+# Requires Rust/Cargo; see docs/INSTALLATION.md before installing.
+periodfind_cpu @ git+https://github.com/scope-ml/periodfind.git@e96c6e1ffa9ca8f3ade633e800e60a6256006102#subdirectory=rust
+periodfind @ git+https://github.com/scope-ml/periodfind.git@e96c6e1ffa9ca8f3ade633e800e60a6256006102

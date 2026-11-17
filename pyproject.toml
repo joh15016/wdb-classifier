@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "wdb-classifier"
+version = "0.1.0"
+description = "White-dwarf-binary classification with portable features and Hyrax workflows"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "hyrax==0.13.1",
+    "tomlkit>=0.14,<0.15",
+    "numpy>=1.26,<3",
+    "pandas>=2,<4",
+    "pyarrow>=12",
+    "scikit-learn>=1.7,<2",
+    "joblib>=1.3",
+    "threadpoolctl>=3",
+]
+
+[project.optional-dependencies]
+features = ["light-curve>=0.9"]
+ztf = ["penquins>=2.4", "PyYAML>=6"]
+eclipse = ["astropy>=5.2"]
+plots = ["matplotlib>=3.7"]
+dev = ["pytest>=7.4", "ruff>=0.4", "detect-secrets>=1.5,<2"]
+
+[project.scripts]
+wdb-classifier = "wdb_classifier.cli:main"
+wdb-ztf-fetch = "wdb_classifier.photometry.access.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]
