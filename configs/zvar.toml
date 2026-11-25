@@ -1,0 +1,9 @@
+[zvar]
+base_url = "https://api.zvar.caltech.edu/imdiff"
+radius_arcsec = 3.0
+accept_radius_arcsec = 1.5
+batch_size = 10
+timeout = 30
+
+# Authentication is read only from ZVAR_USERNAME and ZVAR_PASSWORD.
+# No credentials, catalog periods or labels belong in this file.

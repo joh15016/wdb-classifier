@@ -7,4 +7,4 @@ dependencies:
   - pip:
       - --extra-index-url https://download.pytorch.org/whl/cpu
       - -c constraints-cpu.txt
-      - -e .[features,ztf,eclipse,dev]
+      - -e .[features,ztf,zvar,eclipse,dev]

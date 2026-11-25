@@ -15,10 +15,26 @@ def main():
         fetch_parser.add_argument(f"--{name}", type=Path, required=True)
     fetch_parser.add_argument("--max-new-sources", type=int, default=20)
     fetch_parser.add_argument("--token-env", default="WDB_ZTF_TOKEN")
+    zvar_parser = commands.add_parser("zvar-fetch", help="Cache precomputed ZVAR FPW candidates by position")
+    for name in ("photometry", "config", "output"):
+        zvar_parser.add_argument(f"--{name}", type=Path, required=True)
+    zvar_parser.add_argument("--max-new-sources", type=int, default=20)
     extract_parser = commands.add_parser("extract", help="Compute period, Fourier and eclipse features")
     for name in ("photometry", "config", "output"):
         extract_parser.add_argument(f"--{name}", type=Path, required=True)
     extract_parser.add_argument("--cached-peaks", type=Path)
+    extract_parser.add_argument(
+        "--zvar-cache",
+        type=Path,
+        help="ZVAR cache directory; reuse FPW candidates without querying during extraction",
+    )
+    extract_parser.add_argument(
+        "--zvar-mode",
+        choices=("supplement", "prefer"),
+        default="supplement",
+        help="Supplement local searches (default), or prefer ZVAR with local fallback",
+    )
+    extract_parser.add_argument("--zvar-bands", choices=("any_gr", "same_band"), default="any_gr")
     extract_parser.add_argument("--baseline-days", type=float)
     extract_parser.add_argument("--max-new-sources", type=int, default=1)
     extract_parser.add_argument("--max-trials", type=int, default=7_000_000)
@@ -45,6 +61,12 @@ def main():
             max_new_sources=args.max_new_sources,
             token_env=args.token_env,
         )
+    elif args.command == "zvar-fetch":
+        from .zvar import ZVARConfig, fetch
+
+        result = fetch(
+            args.photometry, ZVARConfig.load(args.config), args.output, max_new_sources=args.max_new_sources
+        )
     else:
         from .extract import run
 
@@ -53,6 +75,9 @@ def main():
             args.config,
             args.output,
             cached_peaks=args.cached_peaks,
+            zvar_cache=args.zvar_cache,
+            zvar_mode=args.zvar_mode,
+            zvar_bands=args.zvar_bands,
             max_new_sources=args.max_new_sources,
             baseline_days=args.baseline_days,
             max_trials=args.max_trials,

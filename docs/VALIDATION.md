@@ -14,6 +14,14 @@ checks software consistency, not whether every selected period is a true orbital
 period. Eclipse-support requirements reduce single-point artifacts but do not
 guarantee physical binary identification.
 
+ZVAR fixture tests cover authenticated-query failure handling, empty/ambiguous
+matches, coordinate checks, candidate ranking/bands/units, lookup and feature
+checkpoint reuse, FPW significance namespacing, and local fallback. A preferred
+ZVAR extraction test forbids local grid construction/search to verify that FPW
+reuse actually avoids those calculations. Supplementation preserves the locally
+selected period while adding external eclipse hypotheses. None of these software
+tests establish equivalence of trained classifiers or survey completeness.
+
 Before reporting WDB completeness, contamination or discoveries:
 
 - Freeze the target population, photometric quality rules and feature schema.

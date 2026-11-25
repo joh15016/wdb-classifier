@@ -93,6 +93,88 @@ eclipse features without searching the period grid. The cache must have unique
 source/band keys, all requested peak fields, and matching fingerprints of the
 ordered input photometry. Source IDs alone do not establish cache compatibility.
 
+## Reuse precomputed ZVAR FPW results
+
+ZVAR can supply external FPW period hypotheses when generating features. It
+does not replace the light curve: Fourier and eclipse measurements still use
+the supplied photometry. Install the `zvar` extra and export your existing
+`ZVAR_USERNAME` and `ZVAR_PASSWORD` locally. No credentials belong in the config.
+
+First cache candidate periods using photometry's `source_id, ra, dec`:
+
+```bash
+python -m wdb_classifier.photometry zvar-fetch \
+  --photometry data/ztf_photometry/photometry.parquet \
+  --config configs/zvar.toml --output data/zvar_periods --max-new-sources 20
+```
+
+Repeat to finish the desired cohort. Cached successful lookups, including empty
+and ambiguous matches, are reused without credentials or network access. Failed
+HTTP/authentication or malformed responses stop the fetch and are **not** cached
+as missing sources. The fetcher requests no photometry and sends no labels,
+classifier scores or known orbital periods. Missing coordinates are recorded
+explicitly. Multiple PS1 counterparts are marked ambiguous rather than silently
+choosing the closest. Default search/acceptance radii are 3/1.5 arcsec.
+
+Use the cached FPW results during extraction:
+
+```bash
+python -m wdb_classifier.photometry extract \
+  --photometry data/ztf_photometry/photometry.parquet \
+  --config configs/period_eclipse.toml --output runs/features_with_zvar \
+  --zvar-cache data/zvar_periods --zvar-mode supplement --max-new-sources 20
+```
+
+There are two explicit policies:
+
+- `supplement` (default when a ZVAR cache is supplied): keep the configured local
+  searches and their selected-period Fourier fit; add ZVAR FPW metadata and its
+  period/harmonic hypotheses to the eclipse measurements. Local algorithms must
+  exclude FPW in this mode so FPW is not redundantly searched. If no usable ZVAR
+  result exists, ordinary local features are still computed.
+- `prefer`: use available ZVAR candidates for the selected-period Fourier fit
+  and eclipse hypotheses **without allocating or searching a dense local grid**.
+  Sources lacking an unambiguous usable result fall back to the configured local
+  searches. A matching `--cached-peaks` table can supply those fallback results
+  without regenerating expensive periodograms.
+
+Both policies create a new, explicit 57-field schema: the original 50 fields
+plus `zvar_fpw_available`, `zvar_fpw_period` (days), `zvar_fpw_significance`
+(raw FPW score), `zvar_fpw_fap`, `zvar_fpw_n_sigma`, `zvar_fpw_bin`, and
+`zvar_fpw_candidate_count`. Missing FPW measurements remain missing, with an
+availability indicator. In `prefer` mode, `period_significance` is missing for
+ZVAR-selected periods; an FPW score is never substituted into the local-search
+significance field. **Train/evaluate a model with the chosen profile; do not
+silently swap it into a model trained on the original features.**
+
+Candidates are restricted to the configured period range, and flagged duplicate
+frequencies are excluded. There is no minimum-significance cut or source rejection.
+The lowest calibrated FAP selects the representative FPW period; if FAP is absent,
+the deterministic fallback prefers the finest bin, then its raw significance.
+All retained candidates, not just that representative, feed eclipse measurements.
+`--zvar-bands any_gr` (default) allows both g and r hypotheses, including when our
+most-observed band is i; `same_band` restricts candidates to the selected band.
+These are external hypotheses from different data, not guaranteed phase-coherent
+periods for the input light curve. No HJD/BJD conversion or period refinement is
+performed. The API's returned candidates need not be the complete on-disk peak set.
+
+`features.parquet` records `period_provider` and `zvar_status` as provenance, not
+classifier fields. `zvar_candidates.parquet` preserves PS1 ID, band, field,
+CCD/quadrant, bin and FPW statistics. `peaks.parquet` contains only actual local
+search/replay rows, never fabricated local peaks for ZVAR-backed sources.
+
+Finish or freeze the desired lookup cache before extraction: source-cache hashes,
+matching policy, code, feature mode and photometry fingerprints are checked on
+resume. Changes require a new feature output directory. Existing periodograms
+can still be reused with `--cached-peaks`; do not erase prior run directories.
+Extraction itself is offline once lookup results are cached. Neither a missing
+ZVAR counterpart nor a weak FPW period means that a source is physically not a WDB.
+
+See the [ZVAR DR1 paper](https://arxiv.org/html/2611.16166v1) and the
+[official API documentation](https://api.zvar.caltech.edu/imdiff/docs) for the
+external data products. This integration supplies features; it does not establish
+that classifier recall or false-positive rates are unchanged.
+
 ## Optional magnitude statistics
 
 ```bash

@@ -19,6 +19,8 @@ It does not use AppleCiDEr/FLARE pretrained classifiers or require their code.
 - Authenticated ZTF retrieval, quality filtering and reusable per-source caches.
 - Period searches, multiple candidate peaks, harmonic/sidereal-alias consensus,
   Fourier measurements and eclipse-specific features.
+- Optional reuse of precomputed ZVAR FPW results during feature generation,
+  with separate provenance, resumable lookup caches and local-search fallback.
 - Optional magnitude statistics from the independent `light-curve` library.
 - Random forest and Extra Trees training/inference through registered Hyrax
   operations, without modifying Hyrax or routing trees through a neural optimizer.
@@ -34,7 +36,7 @@ The tested CPU setup targets Python 3.11 on Linux x86_64:
 python3.11 -m venv .venv
 source .venv/bin/activate
 python -m pip install --extra-index-url https://download.pytorch.org/whl/cpu \
-  -c constraints-cpu.txt -e '.[features,ztf,eclipse,dev]'
+  -c constraints-cpu.txt -e '.[features,ztf,zvar,eclipse,dev]'
 ```
 
 See [installation](docs/INSTALLATION.md) for the pinned native periodfinding
@@ -119,6 +121,8 @@ Period/eclipse extraction produces 50 fields; optional magnitude statistics
 produce a separate 16-field table plus quality diagnostics. Choose and join
 features explicitly using the same source/band policy for training and inference.
 Their presence does not define or validate a complete scientific classifier.
+The opt-in ZVAR profile adds seven namespaced FPW fields; see
+[ZVAR feature generation](PHOTOMETRY.md#reuse-precomputed-zvar-fpw-results).
 
 Gaia associations, astrophysical preselection, automated source-level feature
 assembly, calibrated ensembles, independent completeness/contamination studies

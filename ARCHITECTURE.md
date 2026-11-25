@@ -7,6 +7,7 @@ application targets periodic white dwarf binary light curves.
 | Responsibility | Component |
 |---|---|
 | ZTF retrieval and quality filtering | WDB photometry client using Penquins |
+| Precomputed FPW period hypotheses | Optional authenticated ZVAR client and separate external-result cache |
 | Period, Fourier and eclipse measurements | WDB photometry package using periodfind and Astropy |
 | Optional magnitude statistics | WDB adapter to the independent light-curve library |
 | Named feature schemas and portable tables | WDB data layer |

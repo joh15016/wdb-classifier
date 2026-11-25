@@ -21,7 +21,7 @@ def test_test_environment_does_not_share_other_site_packages():
 def test_environment_manifest_is_project_scoped():
     text = (ROOT / "environment.yml").read_text()
     assert "name: wdb-classifier-cpu" in text
-    assert "- -e .[features,ztf,eclipse,dev]" in text
+    assert "- -e .[features,ztf,zvar,eclipse,dev]" in text
     assert all(value not in text for value in ("/home/", "/Users/", "prefix:", "system-site-packages"))
 
 
